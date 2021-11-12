@@ -24,6 +24,12 @@
  */
 package com.oracle.svm.core.jdk11;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+
 import com.oracle.svm.core.annotate.Alias;
 import com.oracle.svm.core.annotate.RecomputeFieldValue;
 import com.oracle.svm.core.annotate.Substitute;
@@ -33,12 +39,6 @@ import com.oracle.svm.core.jdk.JDK11OrEarlier;
 import com.oracle.svm.core.jdk.JDK11OrLater;
 import com.oracle.svm.core.jdk.Resources;
 import com.oracle.svm.core.jdk.resources.ResourceStorageEntry;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
 
 @SuppressWarnings("unused")
 @TargetClass(value = java.lang.Module.class, onlyWith = JDK11OrLater.class)
@@ -51,10 +51,12 @@ public final class Target_java_lang_Module_JDK11OrLater {
         return true;
     }
 
+    @Alias private String name;
+
     @SuppressWarnings("static-method")
     @Substitute
-    public InputStream getResourceAsStream(String name) {
-        ResourceStorageEntry res = Resources.get(name);
+    public InputStream getResourceAsStream(String resourceName) {
+        ResourceStorageEntry res = Resources.get(name, resourceName);
         return res == null ? null : new ByteArrayInputStream(res.getData().get(0));
     }
 

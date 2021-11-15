@@ -36,6 +36,12 @@ import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        boolean enabled = false;
+        assert enabled = true;
+        if (!enabled) {
+            throw new AssertionError("Run/build this example with assertions enabled (-ea)");
+        }
+
         Module helloAppModule = Main.class.getModule();
         Module helloLibModule = Greeter.class.getModule();
         testModuleObjects(helloAppModule, helloLibModule);

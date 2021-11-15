@@ -1097,6 +1097,7 @@ def hellomodule(args):
     with native_image_context(hosted_assertions=False, config=config) as native_image:
         module_path_sep = ';' if mx.is_windows() else ':'
         moduletest_run_args = [
+            '-ea',
             '--add-exports=moduletests.hello.lib/hello.privateLib=moduletests.hello.app',
             '--add-opens=moduletests.hello.lib/hello.privateLib2=moduletests.hello.app',
             '-p', module_path_sep.join(module_path), '-m', 'moduletests.hello.app'
@@ -1112,7 +1113,7 @@ def hellomodule(args):
         # Build module into native image
         mx.log('Building image from java modules: ' + str(module_path))
         built_image = native_image([
-            '--verbose', '-ea', '-H:Path=' + build_dir,
+            '--verbose', '-H:Path=' + build_dir,
             '--trace-class-initialization=hello.lib.Greeter', # also test native-image-diagnostics-agent
             ] + moduletest_run_args)
         mx.log('Running image ' + built_image + ' built from module:')

@@ -55,6 +55,7 @@ import org.graalvm.nativeimage.Platforms;
 import org.graalvm.nativeimage.hosted.Feature;
 
 import com.oracle.graal.pointsto.meta.AnalysisUniverse;
+import com.oracle.svm.core.SubstrateUtil;
 import com.oracle.svm.core.annotate.AutomaticFeature;
 import com.oracle.svm.core.jdk.JDK11OrLater;
 import com.oracle.svm.core.jdk11.BootModuleLayerSupport;
@@ -136,10 +137,19 @@ public final class ModuleLayerFeature implements Feature {
                         .map(t -> t.getJavaClass().getModule())
                         .collect(Collectors.toSet());
 
-        ImageSingletons.lookup(ResourcesFeature.class).includedResourcesModules.forEach(moduleName -> {
+        Set<String> extraModules = new HashSet<>();
+
+        extraModules.addAll(ImageSingletons.lookup(ResourcesFeature.class).includedResourcesModules);
+
+        String explicitlyAddedModules = System.getProperty(ModuleSupport.PROPERTY_IMAGE_EXPLICITLY_ADDED_MODULES, "");
+        if (!explicitlyAddedModules.isEmpty()) {
+            extraModules.addAll(Arrays.asList(SubstrateUtil.split(explicitlyAddedModules, ",")));
+        }
+
+        extraModules.forEach(moduleName -> {
             Optional<?> module = accessImpl.imageClassLoader.findModule(moduleName);
             if (module.isEmpty()) {
-                VMError.shouldNotReachHere("ResourcesFeature requires module that is not available");
+                VMError.shouldNotReachHere("Explicitly required module " + moduleName + " is not available");
             }
             analysisReachableModules.add((Module) module.get());
         });

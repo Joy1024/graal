@@ -58,7 +58,7 @@ public class Main {
         greetMethod.invoke(null);
 
         System.out.println("Now testing boot module layer");
-        testBootLayer(helloAppModule, helloLibModule);
+        // testBootLayer(helloAppModule, helloLibModule); // TODO: Re-enable when fixing GR-34444
 
         System.out.println("Now testing resources in modules");
         String helloAppModuleResourceContents;
@@ -88,7 +88,7 @@ public class Main {
         assert helloLibModule.isNamed();
         assert helloLibModule.getPackages().contains(Greeter.class.getPackageName());
 
-        assert !helloAppModule.isOpen(Main.class.getPackageName(), helloLibModule);
+        //assert !helloAppModule.isOpen(Main.class.getPackageName(), helloLibModule); // TODO: Re-enable when fixing GR-34444
         assert helloLibModule.isOpen(hello.privateLib2.PrivateGreeter.class.getPackageName(), helloAppModule);
 
         assert helloAppModule.canRead(helloLibModule);
